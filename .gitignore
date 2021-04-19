@@ -2,3 +2,7 @@ archive
 .DS_Store
 .ipynb_checkpoints/
 df_with_images.pkl
+test-labels.npy
+test.npy
+train-labels.npy
+train.npy

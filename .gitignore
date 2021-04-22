@@ -8,3 +8,6 @@ train-labels.npy
 train.npy
 *.npy
 *.pkl
+*.jpeg
+Untit*
+*.pt

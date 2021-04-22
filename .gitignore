@@ -6,3 +6,8 @@ test-labels.npy
 test.npy
 train-labels.npy
 train.npy
+*.npy
+*.pkl
+*.jpeg
+Untit*
+*.pt

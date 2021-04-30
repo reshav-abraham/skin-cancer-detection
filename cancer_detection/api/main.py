@@ -8,11 +8,13 @@ import numpy as np
 import json
 from sklearn import preprocessing
 import torch.nn.functional as F
+from skimage.transform import rescale, resize, downscale_local_mean
 
 import torch
-
-
+import cv2
+import numpy as np
 import os
+from fastapi import FastAPI, File, UploadFile
 
 app = FastAPI()
 
@@ -36,6 +38,9 @@ model_path = '/Users/reshavabraham/personal_work/skin-cancer-detection/notebooks
 model = ImageCLFNet()
 model.load_state_dict(torch.load(model_path))
 model.eval()
+
+encoder = preprocessing.LabelEncoder()
+encoder.classes_ = np.load('../../numpy-dump/lesion-classes.npy')
 
 
 def test(test_loader, le):
@@ -89,3 +94,34 @@ async def get_test_acc():
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=64, shuffle=True)
     test_loss, correct, d_len, acc = test(test_loader, le)
     return {"message": [test_loss, correct, d_len, acc]}
+
+# https://fastapi.tiangolo.com/tutorial/request-files/
+
+
+# https://stackoverflow.com/questions/61333907/receiving-an-image-with-fast-api-processing-it-with-cv2-then-returning-it
+@app.post("/classifyImage")
+async def analyze_route(file: UploadFile = File(...)):
+    print(file.file)
+    contents = await file.read()
+    nparr = np.fromstring(contents, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    RGB_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    RGB_img_scaled = resize(RGB_img, (56, 75), anti_aliasing=True)
+    image_tensor = torch.tensor(RGB_img_scaled).float().view(1, 3, 75, 56)
+    output = model(image_tensor)
+    pred = output.data.max(1, keepdim=True)[1]
+    print("pred", encoder.classes_[pred])
+    # img_dimensions = str(img.shape)
+    # return_img = processImage(img)
+
+    # line that fixed it
+    # _, encoded_img = cv2.imencode('.PNG', return_img)
+
+    # encoded_img = base64.b64encode(encoded_img)
+
+    return{
+        'filename': file.filename,
+        'dimensions': img.shape,
+        'encoded_img': encoder.classes_[pred],
+    }

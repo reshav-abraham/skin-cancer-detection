@@ -125,3 +125,5 @@ async def analyze_route(file: UploadFile = File(...)):
         'dimensions': img.shape,
         'encoded_img': encoder.classes_[pred],
     }
+
+# endpoint submit url and scrape image!

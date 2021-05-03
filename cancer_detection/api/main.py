@@ -101,7 +101,7 @@ async def get_test_acc():
 # https://stackoverflow.com/questions/61333907/receiving-an-image-with-fast-api-processing-it-with-cv2-then-returning-it
 @app.post("/classifyImage")
 async def analyze_route(file: UploadFile = File(...)):
-    print(file.file)
+    # print(file.file)
     contents = await file.read()
     nparr = np.fromstring(contents, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)

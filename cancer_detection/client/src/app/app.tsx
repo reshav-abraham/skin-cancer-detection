@@ -7,8 +7,7 @@ import { ImageUpload } from "./components/ImageUpload";
 const App: React.FC = () => {
     return (
         <div>
-            <h3>Hello</h3>
-            <ImageUpload text='hello'/>
+            <ImageUpload text=''/>
         </div>
     );
 };
